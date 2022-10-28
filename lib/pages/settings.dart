@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wordpress_app/main.dart';
+import 'package:flutter_wordpress_app/pages/authentication/email/register.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -8,7 +10,11 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-
+  LogoutUser() async {
+    await auth.signOut();
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => SignupScreen()));
+  }
   @override
   void initState() {
     super.initState();
@@ -61,7 +67,6 @@ class _SettingsState extends State<Settings> {
             ListView(
               shrinkWrap: true,
               children: <Widget>[
-                
                 ListTile(
                   leading: Image.asset(
                     "assets/more/contact.png",
@@ -114,8 +119,13 @@ class _SettingsState extends State<Settings> {
                     subtitle: Text("Spread the words of flutter blog crumet"),
                   ),
                 ),
-              ],
-            )
+                TextButton(onPressed: ()async{
+                  await auth.signOut().then((_)async{
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SignupScreen()));
+                  });
+                }, child: Text('Log Out')),
+              ]
+            ),
           ],
         ),
       ),

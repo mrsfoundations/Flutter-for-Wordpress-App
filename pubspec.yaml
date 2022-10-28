@@ -23,6 +23,12 @@ dependencies:
   sqflite: ^2.0.0+4
   shared_preferences: ^2.0.8
   flutter_widget_from_html: ^0.7.0
+  firebase_auth: ^4.0.2
+  cloud_firestore: ^4.0.2
+  firebase_storage: ^11.0.2
+  google_sign_in: ^5.4.2
+  pinput: ^2.2.16
+
 
 dev_dependencies:
   flutter_test:
