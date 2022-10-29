@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/main.dart';
+import 'package:flutter_wordpress_app/pages/authentication/email/login.dart';
 import 'package:flutter_wordpress_app/pages/authentication/email/register.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+
 
 class Settings extends StatefulWidget {
   @override
@@ -13,14 +16,12 @@ class _SettingsState extends State<Settings> {
   LogoutUser() async {
     await auth.signOut();
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => SignupScreen()));
+        context, MaterialPageRoute(builder: (context) => LoginScreen()));
   }
   @override
   void initState() {
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +39,12 @@ class _SettingsState extends State<Settings> {
         ),
         elevation: 5,
         backgroundColor: Colors.white,
+        actions: <Widget>[
+          IconButton(onPressed:(){
+            LogoutUser();
+          },
+              icon:const Icon(Icons.logout),color:Colors.black),
+        ]
       ),
       body: Container(
         decoration: BoxDecoration(color: Colors.white),
@@ -62,7 +69,6 @@ class _SettingsState extends State<Settings> {
             ),
             Divider(
               height: 10,
-              thickness: 2,
             ),
             ListView(
               shrinkWrap: true,

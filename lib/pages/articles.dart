@@ -42,6 +42,7 @@ class _ArticlesState extends State<Articles> {
   }
 
   Future<List<dynamic>> fetchLatestArticles(int page) async {
+    var WORDPRESS_URL="http://geo.clouds4all.in/news/";
     try {
       var response = await http.get(
           Uri.parse('$WORDPRESS_URL/wp-json/wp/v2/posts/?page=$page&per_page=10&_fields=id,date,title,content,custom,link'));
@@ -69,6 +70,7 @@ class _ArticlesState extends State<Articles> {
   }
 
   Future<List<dynamic>> fetchFeaturedArticles(int page) async {
+    var WORDPRESS_URL="http://geo.clouds4all.in/news/";
     try {
       var response = await http.get(
           Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts/?categories[]=$FEATURED_ID&page=$page&per_page=10&_fields=id,date,title,content,custom,link"));

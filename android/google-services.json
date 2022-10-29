@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:144718166492:android:82cb1fa01ea4ddebd13719",
+        "mobilesdk_app_id": "1:144718166492:android:73f0cd2cfdeeb75cd13719",
         "android_client_info": {
-          "package_name": "com.example.flutter_for_wordpress_app"
+          "package_name": "com.cloudsindia.beemass"
         }
       },
       "oauth_client": [

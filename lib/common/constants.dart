@@ -1,7 +1,7 @@
 library constants;
 
-// Your wordpress website URL
-const String WORDPRESS_URL = "https://flutterblog.crumet.com";
+// Your wordpress website URL For Eg:http://wordpress.in/
+const String WORDPRESS_URL = "Enter Your WORDPRESS_URL";
 
 // Featured category ID (for Home Screen top section)
 const int FEATURED_ID = 2;
