@@ -1,13 +1,13 @@
 library constants;
 
 // Your wordpress website URL For Eg:http://wordpress.in/
-const String WORDPRESS_URL = "Enter Your WORDPRESS_URL";
+const String WORDPRESS_URL = "";
 
 // Featured category ID (for Home Screen top section)
 const int FEATURED_ID = 2;
 
 // Tab 2 page category name
-const String PAGE2_CATEGORY_NAME = "Lifestyle";
+const String PAGE2_CATEGORY_NAME = "Categories";
 
 // Tab 2 page category ID
 const int PAGE2_CATEGORY_ID = 6;

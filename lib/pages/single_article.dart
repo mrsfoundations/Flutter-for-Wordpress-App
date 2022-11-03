@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -23,14 +23,51 @@ class SingleArticle extends StatefulWidget {
 }
 
 class _SingleArticleState extends State<SingleArticle> {
+  bool isSpeaking = false;
+  final _flutterTts = FlutterTts();
   List<dynamic> relatedArticles = [];
   Future<List<dynamic>>? _futureRelatedArticles;
 
+  void initialization(){
+    _flutterTts.setStartHandler((){
+      setState(() {
+        isSpeaking=true;
+      });
+    });
+    _flutterTts.setCompletionHandler(() {
+      setState(() {
+        isSpeaking=false;
+      });
+    });
+    _flutterTts.setErrorHandler((message) {
+      setState(() {
+        isSpeaking=false;
+      });
+    });
+     }
   @override
   void initState() {
     super.initState();
+    initialization();
 
+    print('hi');
     _futureRelatedArticles = fetchRelatedArticles();
+
+    print(_futureRelatedArticles);
+  }
+  void speak()async{
+    await _flutterTts.setLanguage('ta');
+    await _flutterTts.setSpeechRate(0.5);
+    if(_futureRelatedArticles != null){
+      await _flutterTts.speak(widget.article.content);
+    }
+  }
+  void stop()async{
+    await _flutterTts.stop();
+    setState(() {
+      isSpeaking = false;
+    });
+
   }
 
   Future<List<dynamic>> fetchRelatedArticles() async {
@@ -48,7 +85,6 @@ class _SingleArticleState extends State<SingleArticle> {
                 .map((m) => Article.fromJson(m))
                 .toList();
           });
-
           return relatedArticles;
         }
       }
@@ -60,6 +96,7 @@ class _SingleArticleState extends State<SingleArticle> {
 
   @override
   void dispose() {
+    _flutterTts.stop();
     super.dispose();
     relatedArticles = [];
   }
@@ -270,6 +307,18 @@ class _SingleArticleState extends State<SingleArticle> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          FloatingActionButton(
+            child: Icon(Icons.mic),
+            onPressed: (){
+              isSpeaking ? stop() : speak();
+            },
+          ),
+        ],
       ),
     );
   }

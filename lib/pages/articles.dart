@@ -1,14 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-
+import 'dart:io' show Platform, SocketException;
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
+import 'package:flutter_wordpress_app/pages/texttospeech.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:flutter_wordpress_app/widgets/articleBoxFeatured.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'authentication/email/login.dart';
+import 'local_articles.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
+  runApp(Articles());
+}
 
 class Articles extends StatefulWidget {
   @override
@@ -16,6 +26,8 @@ class Articles extends StatefulWidget {
 }
 
 class _ArticlesState extends State<Articles> {
+  AdRequest? adRequest;
+  BannerAd? bannerAd;
   List<dynamic> featuredArticles = [];
   List<dynamic> latestArticles = [];
   Future<List<dynamic>>? _futureLastestArticles;
@@ -27,6 +39,28 @@ class _ArticlesState extends State<Articles> {
   @override
   void initState() {
     super.initState();
+    String bannerId = Platform.isAndroid
+        ? "ca-app-pub-3940256099942544/6300978111"
+        : "ca-app-pub-3940256099942544/2934735716";
+
+    adRequest = AdRequest(
+      nonPersonalizedAds: false,
+    );
+    BannerAdListener bannerAdListener = BannerAdListener(
+      onAdClosed: (ad) {
+        bannerAd!.load();
+      },
+      onAdFailedToLoad: (ad, error) {
+        bannerAd!.load();
+      },
+    );
+    bannerAd = BannerAd(
+      size: AdSize.banner,
+      adUnitId: bannerId,
+      listener: bannerAdListener,
+      request: adRequest!,
+    );
+    bannerAd!.load();
     _futureLastestArticles = fetchLatestArticles(1);
     _futureFeaturedArticles = fetchFeaturedArticles(1);
     _controller =
@@ -37,15 +71,15 @@ class _ArticlesState extends State<Articles> {
 
   @override
   void dispose() {
+    bannerAd!.dispose();
     super.dispose();
     _controller!.dispose();
   }
 
   Future<List<dynamic>> fetchLatestArticles(int page) async {
-    var WORDPRESS_URL="http://geo.clouds4all.in/news/";
     try {
-      var response = await http.get(
-          Uri.parse('$WORDPRESS_URL/wp-json/wp/v2/posts/?page=$page&per_page=10&_fields=id,date,title,content,custom,link'));
+      var response = await http.get(Uri.parse(
+          '$WORDPRESS_URL/wp-json/wp/v2/posts/?page=$page&per_page=10&_fields=id,date,title,content,custom,link'));
       if (this.mounted) {
         if (response.statusCode == 200) {
           setState(() {
@@ -70,10 +104,9 @@ class _ArticlesState extends State<Articles> {
   }
 
   Future<List<dynamic>> fetchFeaturedArticles(int page) async {
-    var WORDPRESS_URL="http://geo.clouds4all.in/news/";
     try {
-      var response = await http.get(
-          Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts/?categories[]=$FEATURED_ID&page=$page&per_page=10&_fields=id,date,title,content,custom,link"));
+      var response = await http.get(Uri.parse(
+          "$WORDPRESS_URL/wp-json/wp/v2/posts/?categories[]=$FEATURED_ID&page=$page&per_page=10&_fields=id,date,title,content,custom,link"));
 
       if (this.mounted) {
         if (response.statusCode == 200) {
@@ -111,28 +144,77 @@ class _ArticlesState extends State<Articles> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Image(
-            image: AssetImage('assets/icon.png'),
-            height: 45,
-          ),
-          elevation: 5,
-          backgroundColor: Colors.white,
-        ),
-        body: Container(
-          decoration: BoxDecoration(color: Colors.white70),
-          child: SingleChildScrollView(
-            controller: _controller,
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: <Widget>[
-                featuredPost(_futureFeaturedArticles as Future<List<dynamic>>),
-                latestPosts(_futureLastestArticles as Future<List<dynamic>>)
-              ],
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text("Narasimman"),
+              accountEmail: Text("narasimman@gmail.com"),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.orange,
+                child: Text(
+                  "N",
+                  style: TextStyle(fontSize: 40.0),
+                ),
+              ),
             ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text("Profile"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>Settings()));
+              },
+            ),
+            ListTile(
+
+              title: Text("youtube"),
+              onTap: () {
+                Text('https://www.youtube.com/');
+              },
+            ),
+            ListTile(
+              title: Text("What's App"),
+              onTap: () {
+                Text('https://www.whatsapp/');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("logout"),
+              onTap: () {
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+            ),
+          ],
+        ),
+      ),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Image(
+          image: AssetImage('assets/icon.png'),
+          height: 45,
+        ),
+        elevation: 5,
+        backgroundColor: Colors.red,
+      ),
+
+      body: Container(
+        decoration: BoxDecoration(color: Colors.white70),
+        child: SingleChildScrollView(
+          controller: _controller,
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: <Widget>[
+              featuredPost(_futureFeaturedArticles as Future<List<dynamic>>),
+              latestPosts(_futureLastestArticles as Future<List<dynamic>>)
+            ],
           ),
-        ));
+        ),
+      ),
+
+    );
   }
 
   Widget latestPosts(Future<List<dynamic>> latestArticles) {
@@ -158,19 +240,17 @@ class _ArticlesState extends State<Articles> {
                   child: articleBox(context, item, heroId),
                 );
               }).toList()),
-              !_infiniteStop
-                  ? Container()
-                  : Container()
+              !_infiniteStop ? Container() : Container()
             ],
           );
         } else if (articleSnapshot.hasError) {
           return Container();
         }
         return Container(
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: 150,
-                );
+          alignment: Alignment.center,
+          width: MediaQuery.of(context).size.width,
+          height: 150,
+        );
       },
     );
   }
@@ -200,7 +280,7 @@ class _ArticlesState extends State<Articles> {
           } else if (articleSnapshot.hasError) {
             return Container(
               alignment: Alignment.center,
-              margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
+              margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Column(
@@ -223,11 +303,10 @@ class _ArticlesState extends State<Articles> {
             );
           }
           return Container(
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width,
-              height: 280,
-                  
-                  );
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: 280,
+          );
         },
       ),
     );

@@ -16,7 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Articles(),
     LocalArticles(),
     Search(),
-    Settings()
+    Settings(),
   ];
 
   @override

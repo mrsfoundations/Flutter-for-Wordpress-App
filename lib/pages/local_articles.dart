@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:http/http.dart' as http;
+
+import 'authentication/email/login.dart';
 
 class LocalArticles extends StatefulWidget {
   @override
@@ -79,6 +82,52 @@ class _LocalArticlesState extends State<LocalArticles> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text("Narasimman"),
+              accountEmail: Text("narasimman@gmail.com"),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.orange,
+                child: Text(
+                  "N",
+                  style: TextStyle(fontSize: 40.0),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text("Profile"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>Settings()));
+              },
+            ),
+            ListTile(
+
+              title: Text("youtube"),
+              onTap: () {
+                Text('https://www.youtube.com/');
+              },
+            ),
+            ListTile(
+              title: Text("What's App"),
+              onTap: () {
+                Text('https://www.whatsapp/');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("logout"),
+              onTap: () {
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+            ),
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
@@ -91,7 +140,7 @@ class _LocalArticlesState extends State<LocalArticles> {
               fontFamily: 'Poppins'),
         ),
         elevation: 5,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.red,
       ),
       body: Container(
         child: SingleChildScrollView(

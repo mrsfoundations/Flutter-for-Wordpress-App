@@ -13,11 +13,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  LogoutUser() async {
-    await auth.signOut();
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => LoginScreen()));
-  }
   @override
   void initState() {
     super.initState();
@@ -26,8 +21,8 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
+          automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
           'More',
@@ -38,13 +33,8 @@ class _SettingsState extends State<Settings> {
               fontFamily: 'Poppins'),
         ),
         elevation: 5,
-        backgroundColor: Colors.white,
-        actions: <Widget>[
-          IconButton(onPressed:(){
-            LogoutUser();
-          },
-              icon:const Icon(Icons.logout),color:Colors.black),
-        ]
+        backgroundColor: Colors.red,
+
       ),
       body: Container(
         decoration: BoxDecoration(color: Colors.white),
@@ -125,11 +115,6 @@ class _SettingsState extends State<Settings> {
                     subtitle: Text("Spread the words of flutter blog crumet"),
                   ),
                 ),
-                TextButton(onPressed: ()async{
-                  await auth.signOut().then((_)async{
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SignupScreen()));
-                  });
-                }, child: Text('Log Out')),
               ]
             ),
           ],
