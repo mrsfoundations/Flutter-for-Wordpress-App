@@ -1,22 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show Platform, SocketException;
+import 'dart:io' show SocketException;
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
-import 'package:flutter_wordpress_app/pages/texttospeech.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:flutter_wordpress_app/widgets/articleBoxFeatured.dart';
 import 'package:http/http.dart' as http;
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'authentication/email/login.dart';
-import 'local_articles.dart';
-
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
   runApp(Articles());
 }
 
@@ -26,8 +22,6 @@ class Articles extends StatefulWidget {
 }
 
 class _ArticlesState extends State<Articles> {
-  AdRequest? adRequest;
-  BannerAd? bannerAd;
   List<dynamic> featuredArticles = [];
   List<dynamic> latestArticles = [];
   Future<List<dynamic>>? _futureLastestArticles;
@@ -39,39 +33,11 @@ class _ArticlesState extends State<Articles> {
   @override
   void initState() {
     super.initState();
-    String bannerId = Platform.isAndroid
-        ? "ca-app-pub-3940256099942544/6300978111"
-        : "ca-app-pub-3940256099942544/2934735716";
-
-    adRequest = AdRequest(
-      nonPersonalizedAds: false,
-    );
-    BannerAdListener bannerAdListener = BannerAdListener(
-      onAdClosed: (ad) {
-        bannerAd!.load();
-      },
-      onAdFailedToLoad: (ad, error) {
-        bannerAd!.load();
-      },
-    );
-    bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: bannerId,
-      listener: bannerAdListener,
-      request: adRequest!,
-    );
-    bannerAd!.load();
-    _futureLastestArticles = fetchLatestArticles(1);
-    _futureFeaturedArticles = fetchFeaturedArticles(1);
-    _controller =
-        ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
-    _controller!.addListener(_scrollListener);
-    _infiniteStop = false;
   }
 
   @override
   void dispose() {
-    bannerAd!.dispose();
+
     super.dispose();
     _controller!.dispose();
   }
@@ -168,20 +134,22 @@ class _ArticlesState extends State<Articles> {
             ),
             ListTile(
 
-              title: Text("youtube"),
+              title: Text("Youtube"),
               onTap: () {
-                Text('https://www.youtube.com/');
+                launchYoutube(
+                    Url:
+                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
               },
             ),
             ListTile(
               title: Text("What's App"),
               onTap: () {
-                Text('https://www.whatsapp/');
+                launchWhatsapp(number: "+919790055058", message: "Hi");
               },
             ),
             ListTile(
               leading: Icon(Icons.logout),
-              title: Text("logout"),
+              title: Text("Logout"),
               onTap: () {
                 Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -227,19 +195,19 @@ class _ArticlesState extends State<Articles> {
             children: <Widget>[
               Column(
                   children: articleSnapshot.data!.map((item) {
-                final heroId = item.id.toString() + "-latest";
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SingleArticle(item, heroId),
-                      ),
+                    final heroId = item.id.toString() + "-latest";
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SingleArticle(item, heroId),
+                          ),
+                        );
+                      },
+                      child: articleBox(context, item, heroId),
                     );
-                  },
-                  child: articleBox(context, item, heroId),
-                );
-              }).toList()),
+                  }).toList()),
               !_infiniteStop ? Container() : Container()
             ],
           );
@@ -265,18 +233,18 @@ class _ArticlesState extends State<Articles> {
             if (articleSnapshot.data!.length == 0) return Container();
             return Row(
                 children: articleSnapshot.data!.map((item) {
-              final heroId = item.id.toString() + "-featured";
-              return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SingleArticle(item, heroId),
-                      ),
-                    );
-                  },
-                  child: articleBoxFeatured(context, item, heroId));
-            }).toList());
+                  final heroId = item.id.toString() + "-featured";
+                  return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SingleArticle(item, heroId),
+                          ),
+                        );
+                      },
+                      child: articleBoxFeatured(context, item, heroId));
+                }).toList());
           } else if (articleSnapshot.hasError) {
             return Container(
               alignment: Alignment.center,
@@ -310,5 +278,19 @@ class _ArticlesState extends State<Articles> {
         },
       ),
     );
+  }
+  void launchWhatsapp({@required number, @required message}) async {
+    String url = "whatsapp://send?phone=$number&text=$message";
+    await launchUrlString(url) ? (url) : print("can't open whatsapp");
+  }
+
+  void launchYoutube({required String Url}) async {
+    var url = Uri.parse(
+        "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw"Could't Launch $url";
+    }
   }
 }

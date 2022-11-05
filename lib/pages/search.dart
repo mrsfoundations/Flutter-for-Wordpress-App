@@ -10,6 +10,8 @@ import 'package:flutter_wordpress_app/pages/single_article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:flutter_wordpress_app/widgets/searchBoxes.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'authentication/email/login.dart';
 
@@ -128,20 +130,22 @@ class _SearchState extends State<Search> {
             ),
             ListTile(
 
-              title: Text("youtube"),
+              title: Text("Youtube"),
               onTap: () {
-                Text('https://www.youtube.com/');
+                launchYoutube(
+                    Url:
+                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
               },
             ),
             ListTile(
               title: Text("What's App"),
               onTap: () {
-                Text('https://www.whatsapp/');
+                launchWhatsapp(number: "+919790055058", message: "Hi");
               },
             ),
             ListTile(
               leading: Icon(Icons.logout),
-              title: Text("logout"),
+              title: Text("Logout"),
               onTap: () {
                 Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -282,5 +286,19 @@ class _SearchState extends State<Search> {
             );
       },
     );
+  }
+  void launchWhatsapp({@required number, @required message}) async {
+    String url = "whatsapp://send?phone=$number&text=$message";
+    await launchUrlString(url) ? (url) : print("can't open whatsapp");
+  }
+
+  void launchYoutube({required String Url}) async {
+    var url = Uri.parse(
+        "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw"Could't Launch $url";
+    }
   }
 }

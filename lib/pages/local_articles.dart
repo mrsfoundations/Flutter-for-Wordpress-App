@@ -7,6 +7,8 @@ import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'authentication/email/login.dart';
 
@@ -41,8 +43,8 @@ class _LocalArticlesState extends State<LocalArticles> {
 
   Future<List<dynamic>> fetchLocalArticles(int page) async {
     try {
-      http.Response response = await http.get(
-          Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts/?categories[]=$PAGE2_CATEGORY_ID&page=$page&per_page=10&_fields=id,date,title,content,custom,link"));
+      http.Response response = await http.get(Uri.parse(
+          "$WORDPRESS_URL/wp-json/wp/v2/posts/?categories[]=$PAGE2_CATEGORY_ID&page=$page&per_page=10&_fields=id,date,title,content,custom,link"));
       if (this.mounted) {
         if (response.statusCode == 200) {
           setState(() {
@@ -82,52 +84,6 @@ class _LocalArticlesState extends State<LocalArticles> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Narasimman"),
-              accountEmail: Text("narasimman@gmail.com"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.orange,
-                child: Text(
-                  "N",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text("Profile"),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>Settings()));
-              },
-            ),
-            ListTile(
-
-              title: Text("youtube"),
-              onTap: () {
-                Text('https://www.youtube.com/');
-              },
-            ),
-            ListTile(
-              title: Text("What's App"),
-              onTap: () {
-                Text('https://www.whatsapp/');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("logout"),
-              onTap: () {
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-            ),
-          ],
-        ),
-      ),
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
@@ -151,6 +107,54 @@ class _LocalArticlesState extends State<LocalArticles> {
                 categoryPosts(_futureArticles as Future<List<dynamic>>),
               ],
             )),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text("Narasimman"),
+              accountEmail: Text("narasimman@gmail.com"),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.orange,
+                child: Text(
+                  "N",
+                  style: TextStyle(fontSize: 40.0),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text("Profile"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Settings()));
+              },
+            ),
+            ListTile(
+              title: Text("Youtube"),
+              onTap: () {
+                launchYoutube(
+                    Url:
+                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+              },
+            ),
+            ListTile(
+              title: Text("What's App"),
+              onTap: () {
+                launchWhatsapp(number: "+919790055058", message: "Hi");
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("Logout"),
+              onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -182,7 +186,7 @@ class _LocalArticlesState extends State<LocalArticles> {
                   ? Container(
                       alignment: Alignment.center,
                       height: 30,
-)
+                    )
                   : Container()
             ],
           );
@@ -190,11 +194,26 @@ class _LocalArticlesState extends State<LocalArticles> {
           return Container();
         }
         return Container(
-            alignment: Alignment.center,
-            height: 400,
-            width: MediaQuery.of(context).size.width - 30,
-);
+          alignment: Alignment.center,
+          height: 400,
+          width: MediaQuery.of(context).size.width - 30,
+        );
       },
     );
+  }
+
+  void launchWhatsapp({@required number, @required message}) async {
+    String url = "whatsapp://send?phone=$number&text=$message";
+    await launchUrlString(url) ? (url) : print("can't open whatsapp");
+  }
+
+  void launchYoutube({required String Url}) async {
+    var url = Uri.parse(
+        "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw "Could't Launch $url";
+    }
   }
 }
