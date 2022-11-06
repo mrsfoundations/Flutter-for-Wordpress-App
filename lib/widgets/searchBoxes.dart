@@ -34,11 +34,12 @@ Widget searchBoxes(BuildContext context) {
                   name,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 10,
                     height: 1.2,
                     fontWeight: FontWeight.w500,
                   ),
                 )
+
               ],
             ),
           ),

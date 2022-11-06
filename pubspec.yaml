@@ -33,7 +33,7 @@ dependencies:
   google_mobile_ads: ^2.2.0
   font_awesome_flutter: ^10.2.1
   flutter_tts: ^3.5.3
-  carousel_slider: ^4.1.1
+  flutter_custom_carousel_slider: ^1.2.0
 
 
 dev_dependencies:

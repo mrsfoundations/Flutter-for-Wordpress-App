@@ -8,9 +8,8 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 final auth = FirebaseAuth.instance;
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,);
       runApp(OneSignalScreen());
