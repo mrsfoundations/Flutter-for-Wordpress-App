@@ -1,7 +1,7 @@
 library constants;
 
 // Your wordpress website URL For Eg:http://wordpress.in/
-const String WORDPRESS_URL = "http://geo.clouds4all.in/news/";
+const String WORDPRESS_URL = "Enter the URL";
 
 // Featured category ID (for Home Screen top section)
 const int FEATURED_ID = 2;
