@@ -221,7 +221,7 @@ class _ArticlesState extends State<Articles> {
               onTap: () {
                 launchYoutube(
                     Url:
-                        "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
               },
             ),
             ListTile(
@@ -256,14 +256,14 @@ class _ArticlesState extends State<Articles> {
             child: Column(
               children: <Widget>[
                 Container(
-                  height: 180,
-                  width: 450,
-                child: CustomCarouselSlider(
-                  items: itemList,
-                  showSubBackground: false,
-                  width: MediaQuery.of(context).size.width * .9,
-                  autoplay: true,
-                )),
+                    height: 180,
+                    width: 450,
+                    child: CustomCarouselSlider(
+                      items: itemList,
+                      showSubBackground: false,
+                      width: MediaQuery.of(context).size.width * .9,
+                      autoplay: true,
+                    )),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {
