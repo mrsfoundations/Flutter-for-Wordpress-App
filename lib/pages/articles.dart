@@ -5,15 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_carousel_slider/flutter_custom_carousel_slider.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:flutter_wordpress_app/pages/filepicker.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
+import 'package:flutter_wordpress_app/pages/timeline_news.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
+import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'authentication/email/login.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(Articles());
 }
 
@@ -29,6 +35,7 @@ class _ArticlesState extends State<Articles> {
   ScrollController? _controller;
   int page = 1;
   bool _infiniteStop = false;
+
 
   @override
   void initState() {
@@ -166,25 +173,18 @@ class _ArticlesState extends State<Articles> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Image(
-          image: AssetImage('assets/icon.png'),
-          height: 45,
-        ),
+        title: Text("Latest Blog"),
         elevation: 5,
         backgroundColor: Colors.red,
       ),
       body: Container(
         decoration: BoxDecoration(color: Colors.white70),
-        child: SingleChildScrollView(
-          controller: _controller,
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: <Widget>[
-              // featuredPost(
-              //     _futureFeaturedArticles as Future<List<dynamic>>),
-              latestPosts(_futureLastestArticles as Future<List<dynamic>>)
-            ],
-          ),
+        child: Column(
+          children: <Widget>[
+            // featuredPost(
+            //     _futureFeaturedArticles as Future<List<dynamic>>),
+            latestPosts(_futureLastestArticles as Future<List<dynamic>>)
+          ],
         ),
       ),
       //Drawer
@@ -192,15 +192,12 @@ class _ArticlesState extends State<Articles> {
         child: ListView(
           // Important: Remove any padding from the ListView.
           children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Narasimman"),
-              accountEmail: Text("narasimman@gmail.com"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.orange,
-                child: Text(
-                  "N",
-                  style: TextStyle(fontSize: 40.0),
-                ),
+            DrawerHeader(
+              child:Text("VMT_WordPress",
+                style:TextStyle(fontSize: 25),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
               ),
             ),
             ListTile(
@@ -212,6 +209,14 @@ class _ArticlesState extends State<Articles> {
               },
             ),
             ListTile(
+              leading:  Image.asset('assets/Whatsapp_icon.png',height: 25,),
+              title: Text("What's App"),
+              onTap: () {
+                launchWhatsapp(number: "+919790055058", message: "Hi");
+              },
+            ),
+            ListTile(
+              leading:  Image.asset('assets/Youtubeicon.png',width: 25,),
               title: Text("Youtube"),
               onTap: () {
                 launchYoutube(
@@ -220,9 +225,11 @@ class _ArticlesState extends State<Articles> {
               },
             ),
             ListTile(
-              title: Text("What's App"),
+              leading: Icon(Icons.share),
+              title: Text("Share This App"),
               onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
+                Share.share(
+                    'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
               },
             ),
             ListTile(
@@ -245,39 +252,43 @@ class _ArticlesState extends State<Articles> {
       builder: (context, articleSnapshot) {
         if (articleSnapshot.hasData) {
           if (articleSnapshot.data!.length == 0) return Container();
-          return Column(
-            children: <Widget>[
-              CustomCarouselSlider(
-                items: itemList,
-                height: 150,
-                subHeight: 50,
-                showSubBackground: false,
-                width: MediaQuery.of(context).size.width * .9,
-                autoplay: true,
-              ),
-              RefreshIndicator(
-                onRefresh: () async {
-                  OnRefIndicator(page);
-                },
-                child: ListView(
-                    shrinkWrap: true,
-                    children: articleSnapshot.data!.map((item) {
-                      final heroId = item.id.toString() + "-latest";
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SingleArticle(item, heroId),
-                            ),
+          return Expanded(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: 180,
+                  width: 450,
+                child: CustomCarouselSlider(
+                  items: itemList,
+                  showSubBackground: false,
+                  width: MediaQuery.of(context).size.width * .9,
+                  autoplay: true,
+                )),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      OnRefIndicator(page);
+                    },
+                    child: ListView(
+                        children: articleSnapshot.data!.map((item) {
+                          final heroId = item.id.toString() + "-latest";
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SingleArticle(item, heroId),
+                                ),
+                              );
+                            },
+                            child: articleBox(context, item, heroId),
                           );
-                        },
-                        child: articleBox(context, item, heroId),
-                      );
-                    }).toList()),
-              ),
-              !_infiniteStop ? Container() : Container()
-            ],
+                        }).toList()),
+                  ),
+                ),
+                !_infiniteStop ? Container() : Container()
+              ],
+            ),
           );
         } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
           return Center(

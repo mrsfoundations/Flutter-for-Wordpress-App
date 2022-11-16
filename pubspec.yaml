@@ -34,6 +34,7 @@ dependencies:
   font_awesome_flutter: ^10.2.1
   flutter_tts: ^3.5.3
   flutter_custom_carousel_slider: ^1.2.0
+  timelines: ^0.1.0
 
 
 dev_dependencies:
@@ -55,6 +56,8 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/Whatsapp_icon.png
+    - assets/Youtubeicon.png
     - assets/icon.png
     - assets/no-internet.png
     - assets/play-button.png

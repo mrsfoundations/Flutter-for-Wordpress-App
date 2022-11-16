@@ -3,14 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:flutter_wordpress_app/pages/filepicker.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
+import 'package:flutter_wordpress_app/pages/timeline_news.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
+import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'authentication/email/login.dart';
+
 
 class LocalArticles extends StatefulWidget {
   @override
@@ -105,6 +110,7 @@ class _LocalArticlesState extends State<LocalArticles> {
             child: Column(
               children: <Widget>[
                 categoryPosts(_futureArticles as Future<List<dynamic>>),
+
               ],
             )),
       ),
@@ -112,15 +118,12 @@ class _LocalArticlesState extends State<LocalArticles> {
         child: ListView(
           // Important: Remove any padding from the ListView.
           children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Narasimman"),
-              accountEmail: Text("narasimman@gmail.com"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.orange,
-                child: Text(
-                  "N",
-                  style: TextStyle(fontSize: 40.0),
-                ),
+            DrawerHeader(
+              child:Text("VMT_WordPress",
+                style:TextStyle(fontSize: 25),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
               ),
             ),
             ListTile(
@@ -132,6 +135,14 @@ class _LocalArticlesState extends State<LocalArticles> {
               },
             ),
             ListTile(
+              leading:  Image.asset('assets/Whatsapp_icon.png',height: 25,),
+              title: Text("What's App"),
+              onTap: () {
+                launchWhatsapp(number: "+919790055058", message: "Hi");
+              },
+            ),
+            ListTile(
+              leading:  Image.asset('assets/Youtubeicon.png',width: 25,),
               title: Text("Youtube"),
               onTap: () {
                 launchYoutube(
@@ -140,9 +151,11 @@ class _LocalArticlesState extends State<LocalArticles> {
               },
             ),
             ListTile(
-              title: Text("What's App"),
+              leading: Icon(Icons.share),
+              title: Text("Share This App"),
               onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
+                Share.share(
+                    'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
               },
             ),
             ListTile(
@@ -189,6 +202,10 @@ class _LocalArticlesState extends State<LocalArticles> {
                     )
                   : Container()
             ],
+          );
+        } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
           );
         } else if (articleSnapshot.hasError) {
           return Container();

@@ -5,6 +5,7 @@ import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 
 class CategoryArticles extends StatefulWidget {
@@ -79,6 +80,30 @@ class _CategoryArticlesState extends State<CategoryArticles> {
       });
     }
   }
+  var isLoaded = false;
+  BannerAd? bannerAd;
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    bannerAd=BannerAd(size:AdSize.banner,
+        adUnitId:"ca-app-pub-3940256099942544/6300978111",
+        listener:BannerAdListener(
+            onAdLoaded:(ad){
+              setState(() {
+                isLoaded=true;
+              });
+              print("Banner Loaded");
+            },
+            onAdFailedToLoad:(ad, error) {
+              ad.dispose();
+            }),
+        request: AdRequest()
+    );
+    bannerAd!.load();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +133,10 @@ class _CategoryArticlesState extends State<CategoryArticles> {
             controller: _controller,
             scrollDirection: Axis.vertical,
             child: Column(
-                children: <Widget>[categoryPosts(_futureCategoryArticles as Future<List<dynamic>>)])),
+                children: <Widget>[categoryPosts(_futureCategoryArticles as Future<List<dynamic>>),
+                  isLoaded?Container(
+                    height: 50,
+                    child: AdWidget(ad: bannerAd!,),):SizedBox(),])),
       ),
     );
   }
@@ -143,6 +171,10 @@ class _CategoryArticlesState extends State<CategoryArticles> {
                       )
                   : Container()
             ],
+          );
+        } else if(articleSnapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
           );
         } else if (articleSnapshot.hasError) {
           return Container(

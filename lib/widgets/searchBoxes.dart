@@ -14,6 +14,7 @@ Widget searchBoxes(BuildContext context) {
       var image = cat[1];
       var catId = cat[2];
 
+
       return Card(
         child: InkWell(
           onTap: () {

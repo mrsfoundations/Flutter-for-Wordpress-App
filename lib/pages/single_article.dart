@@ -9,6 +9,7 @@ import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
 import 'package:flutter_wordpress_app/pages/comments.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
 
@@ -99,6 +100,31 @@ class _SingleArticleState extends State<SingleArticle> {
     _flutterTts.stop();
     super.dispose();
     relatedArticles = [];
+  }
+
+  var isLoaded = false;
+  BannerAd? bannerAd;
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    bannerAd=BannerAd(size:AdSize.banner,
+        adUnitId:"ca-app-pub-3940256099942544/6300978111",
+        listener:BannerAdListener(
+            onAdLoaded:(ad){
+              setState(() {
+                isLoaded=true;
+              });
+              print("Banner Loaded");
+            },
+            onAdFailedToLoad:(ad, error) {
+              ad.dispose();
+            }),
+        request: AdRequest()
+    );
+    bannerAd!.load();
   }
 
   @override
@@ -211,6 +237,9 @@ class _SingleArticleState extends State<SingleArticle> {
                     ),
                   ],
                 ),
+                isLoaded?Container(
+                  height: 50,
+                  child: AdWidget(ad: bannerAd!,),):SizedBox(),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,6 +252,7 @@ class _SingleArticleState extends State<SingleArticle> {
                             fontSize: FontSize.em(1.6),
                             padding: EdgeInsets.all(4)),
                       }),
+
                       Container(
                         decoration: BoxDecoration(
                             color: Color(0xFFE3E3E3),
@@ -264,7 +294,8 @@ class _SingleArticleState extends State<SingleArticle> {
                 relatedPosts(_futureRelatedArticles as Future<List<dynamic>>)
               ],
             ),
-          )),
+          )
+      ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
           decoration: BoxDecoration(color: Colors.white10),

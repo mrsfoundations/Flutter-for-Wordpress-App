@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_wordpress_app/pages/authentication/email/login.dart';
 import 'package:flutter_wordpress_app/pages/home.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'firebase_options.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
@@ -12,6 +13,7 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,);
+  MobileAds.instance.initialize();
       runApp(OneSignalScreen());
 }
 class OneSignalScreen extends StatefulWidget {

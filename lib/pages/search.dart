@@ -3,13 +3,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
-import 'package:flutter_wordpress_app/main.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:flutter_wordpress_app/pages/filepicker.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_article.dart';
+import 'package:flutter_wordpress_app/pages/timeline_news.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:flutter_wordpress_app/widgets/searchBoxes.dart';
 import 'package:http/http.dart' as http;
+import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -106,57 +108,9 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Narasimman"),
-              accountEmail: Text("narasimman@gmail.com"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.orange,
-                child: Text(
-                  "N",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text("Profile"),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>Settings()));
-              },
-            ),
-            ListTile(
-
-              title: Text("Youtube"),
-              onTap: () {
-                launchYoutube(
-                    Url:
-                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
-              },
-            ),
-            ListTile(
-              title: Text("What's App"),
-              onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
-              onTap: () {
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-            ),
-          ],
-        ),
-      ),
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Search',
+        title: Text('Categories',
             style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -212,6 +166,61 @@ class _SearchState extends State<Search> {
               searchPosts(_futureSearchedArticles as Future<List<dynamic>>)
             ],
           ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          children: <Widget>[
+            DrawerHeader(
+              child:Text("VMT_WordPress",
+                style:TextStyle(fontSize: 25),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text("Profile"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Settings()));
+              },
+            ),
+            ListTile(
+              leading:  Image.asset('assets/Whatsapp_icon.png',height: 25,),
+              title: Text("What's App"),
+              onTap: () {
+                launchWhatsapp(number: "+919790055058", message: "Hi");
+              },
+            ),
+            ListTile(
+              leading:  Image.asset('assets/Youtubeicon.png',width: 25,),
+              title: Text("Youtube"),
+              onTap: () {
+                launchYoutube(
+                    Url:
+                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.share),
+              title: Text("Share This App"),
+              onTap: () {
+                Share.share(
+                    'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("Logout"),
+              onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+            ),
+          ],
         ),
       ),
     );

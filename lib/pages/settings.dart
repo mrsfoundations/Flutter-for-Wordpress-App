@@ -57,10 +57,6 @@ class _SettingsState extends State<Settings> {
             ),
             ListView(shrinkWrap: true, children: <Widget>[
               ListTile(
-                leading: Image.asset(
-                  "assets/more/contact.png",
-                  width: 30,
-                ),
                 title: Text('Contact'),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +69,7 @@ class _SettingsState extends State<Settings> {
                       child: Text("WhatsApp",style: TextStyle(color: Colors.black54),
                     )),
                     TextButton(
-                      onPressed: () {
+                        onPressed: () {
                         launchYoutube(
                             Url: "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
                       },
@@ -83,7 +79,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
               Divider(
-                height: 10,
+                height: 5,
               ),
               InkWell(
                 onTap: () {
@@ -91,12 +87,8 @@ class _SettingsState extends State<Settings> {
                       'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
                 },
                 child: ListTile(
-                  leading: Image.asset(
-                    "assets/more/share.png",
-                    width: 30,
-                  ),
                   title: Text('Share'),
-                  subtitle: Text("Spread the words of flutter blog crumet"),
+                  subtitle: Text("Spread the words of flutter blog VMT_Wordpress"),
                 ),
               ),
             ]),

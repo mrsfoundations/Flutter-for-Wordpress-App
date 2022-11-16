@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress_app/pages/authentication/email/register.dart';
 import 'package:flutter_wordpress_app/pages/authentication/phone/phone_number_login.dart';
@@ -78,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(30),
         child: MaterialButton(
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-          minWidth: MediaQuery.of(context).size.width,
+          minWidth: 20,
           onPressed: () async {
             print(email);
             print(password);
@@ -110,8 +112,13 @@ class _LoginScreenState extends State<LoginScreen> {
             )
           )
     );
-    final signInWithGoogle=MaterialButton(
-      child: Text('Sign in with Google'),
+    final signInWithGoogle= Material(
+
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+      child:MaterialButton(
+      minWidth:10,
+        child: Text('Sign in with Google'),
       onPressed: () async{
         GoogleSignInAccount? googleUser=await GoogleSignIn().signIn();
         GoogleSignInAuthentication? googleAuth=await googleUser?.authentication;
@@ -123,21 +130,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
         print(userCredential.user?.email);
         if(userCredential.user!=null){
-          // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-          //   builder: (context) => isLoading?CircularProgressIndicator():HomeScreen(),
-          // ), (route) => false);
           Navigator.push(context, MaterialPageRoute(builder: (context)=> MyHomePage()));
         }
 
 
-      },);
+      },));
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(36.0),
               child: Form(
@@ -150,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       emailField,
                       SizedBox(height: 25),
                       PasswordField,
-                      SizedBox(height: 25),
+                      SizedBox(height: 25,width:10),
                       LoginButton,
                       SizedBox(height: 25),
                       signInWithGoogle,
@@ -159,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("If You Don't Have a Account"),
+                          Text("If You Don't Have a Account",style: TextStyle(fontSize:16 ),),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -172,9 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(
                                   color: Colors.red,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 15),
+                                  fontSize: 16),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       SizedBox(
@@ -183,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Login With Phone"),
+                          Text("Login With Phone",style: TextStyle(fontSize:16 ),),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -191,13 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => phonenumber()));
                             },
-                            child: Text(
-                              "Phone_Number",
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15),
-                            ),
+                            child: Icon(Icons.phone,color:Colors.redAccent),
                           )
                         ],
                       )
