@@ -35,6 +35,7 @@ dependencies:
   flutter_tts: ^3.5.3
   flutter_custom_carousel_slider: ^1.2.0
   timelines: ^0.1.0
+  webview_flutter: ^2.0.4
 
 
 dev_dependencies:
@@ -58,6 +59,8 @@ flutter:
   assets:
     - assets/Whatsapp_icon.png
     - assets/Youtubeicon.png
+    - assets/User_Avathar.png
+    - assets/undraw_android_jr64.png
     - assets/icon.png
     - assets/no-internet.png
     - assets/play-button.png

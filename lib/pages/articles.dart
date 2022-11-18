@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_carousel_slider/flutter_custom_carousel_slider.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
-import 'package:flutter_wordpress_app/pages/filepicker.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
-import 'package:flutter_wordpress_app/pages/timeline_news.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
@@ -57,6 +55,7 @@ class _ArticlesState extends State<Articles> {
     try {
       var response = await http.get(Uri.parse(
           '$WORDPRESS_URL/wp-json/wp/v2/posts/?page=$page&per_page=10&_fields=id,date,title,content,custom,link'));
+      print('$WORDPRESS_URL/wp-json/wp/v2/posts/?page=$page&per_page=10&_fields=id,date,title,content,custom,link');
       if (this.mounted) {
         if (response.statusCode == 200) {
           latestArticles.addAll(json
@@ -221,7 +220,7 @@ class _ArticlesState extends State<Articles> {
               onTap: () {
                 launchYoutube(
                     Url:
-                    "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
+                        "https://www.youtube.com/channel/UCgB4uane1_urtf4gyKNJ10A/about");
               },
             ),
             ListTile(
@@ -256,14 +255,14 @@ class _ArticlesState extends State<Articles> {
             child: Column(
               children: <Widget>[
                 Container(
-                    height: 180,
-                    width: 450,
-                    child: CustomCarouselSlider(
-                      items: itemList,
-                      showSubBackground: false,
-                      width: MediaQuery.of(context).size.width * .9,
-                      autoplay: true,
-                    )),
+                  height: 180,
+                  width: 450,
+                child: CustomCarouselSlider(
+                  items: itemList,
+                  showSubBackground: false,
+                  width: MediaQuery.of(context).size.width * .9,
+                  autoplay: true,
+                )),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {

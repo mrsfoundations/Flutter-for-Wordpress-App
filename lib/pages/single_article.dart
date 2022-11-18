@@ -12,6 +12,7 @@ import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class SingleArticle extends StatefulWidget {
   final dynamic article;
@@ -28,6 +29,8 @@ class _SingleArticleState extends State<SingleArticle> {
   final _flutterTts = FlutterTts();
   List<dynamic> relatedArticles = [];
   Future<List<dynamic>>? _futureRelatedArticles;
+
+
 
   void initialization(){
     _flutterTts.setStartHandler((){
@@ -51,7 +54,7 @@ class _SingleArticleState extends State<SingleArticle> {
     super.initState();
     initialization();
 
-    print('hi');
+
     _futureRelatedArticles = fetchRelatedArticles();
 
     print(_futureRelatedArticles);
@@ -141,6 +144,7 @@ class _SingleArticleState extends State<SingleArticle> {
       dailymotionUrl = articleVideo.split("/video/")[1];
     }
 
+
     return Scaffold(
       body: Container(
           decoration: BoxDecoration(color: Colors.white70),
@@ -172,11 +176,12 @@ class _SingleArticleState extends State<SingleArticle> {
                                             BoxDecoration(color: Colors.black),
                                         child: HtmlWidget(
                                           """
-                                      <iframe src="https://www.youtube.com/embed/$youtubeUrl" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                      """,
+                                      <iframe src="https://www.youtube.com/embed/$youtubeUrl" frameborder="0" allow="accelerometer;
+                                       autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>""" ,
                                           webView: true,
                                         ),
                                       )
+
                                     : articleVideo.contains("dailymotion")
                                         ? Container(
                                             padding: EdgeInsets.fromLTRB(
@@ -195,6 +200,7 @@ class _SingleArticleState extends State<SingleArticle> {
                                       allowfullscreen allow="autoplay">
                                       </iframe>
                                       """,
+
                                               webView: true,
                                             ),
                                           )
@@ -264,22 +270,27 @@ class _SingleArticleState extends State<SingleArticle> {
                           style: TextStyle(color: Colors.black, fontSize: 11),
                         ),
                       ),
-                      SizedBox(
-                        height: 45,
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(article.avatar),
-                          ),
-                          title: Text(
-                            "By " + article.author,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                          subtitle: Text(
-                            article.date,
-                            style: TextStyle(fontSize: 11),
-                          ),
-                        ),
-                      ),
+
+                       Card(
+                         child: Container(
+                           height: 60,
+                           color: Colors.lightGreen,
+                           child: ListTile(
+                             leading: CircleAvatar(
+                               backgroundImage: NetworkImage(article.avatar),
+                             ),
+                             title: Text(
+                               "By " + article.author,
+                               style: TextStyle(fontSize: 16),
+                             ),
+                             subtitle: Text(
+                               article.date,
+                               style: TextStyle(fontSize: 12),
+                             ),
+                           ),
+                         ),
+                       ),
+
                       Container(
                         padding: EdgeInsets.fromLTRB(16, 36, 16, 50),
                         child: HtmlWidget(

@@ -5,7 +5,7 @@ import 'package:flutter_wordpress_app/models/Article.dart';
 Widget articleBox(BuildContext context, Article article, String heroId) {
   return ConstrainedBox(
     constraints: new BoxConstraints(
-      maxHeight: 140.0,
+      maxHeight: 170.0,
     ),
     child: Stack(
       children: <Widget>[
@@ -15,10 +15,11 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
             elevation: 6,
             child: Padding(
               padding: EdgeInsets.fromLTRB(110, 0, 0, 0),
+
               child: Column(
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
+                    padding: EdgeInsets.fromLTRB(20, 0, 4, 0),
                     child: Column(
                       children: <Widget>[
                         Container(

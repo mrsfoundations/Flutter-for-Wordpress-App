@@ -51,6 +51,7 @@ class Article {
         .format(DateTime.parse(json["date"]))
         .toString();
 
+
     return Article(
         id: json['id'],
         title: json['title']['rendered'],

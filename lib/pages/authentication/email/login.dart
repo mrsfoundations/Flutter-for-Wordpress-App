@@ -5,6 +5,7 @@ import 'package:flutter_wordpress_app/pages/authentication/email/register.dart';
 import 'package:flutter_wordpress_app/pages/authentication/phone/phone_number_login.dart';
 import 'package:flutter_wordpress_app/pages/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -76,8 +77,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     //Sign-up
     final LoginButton = Material(
+      color: Colors.white,
         elevation: 5,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(10),
         child: MaterialButton(
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 20,
@@ -105,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
             },
 
           child:const Text(
-            "Login",
+            "Sign-In",
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
@@ -116,9 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
-      child:MaterialButton(
-      minWidth:10,
-        child: Text('Sign in with Google'),
+      child:IconButton(
+        icon: FaIcon(FontAwesomeIcons.google),
       onPressed: () async{
         GoogleSignInAccount? googleUser=await GoogleSignIn().signIn();
         GoogleSignInAuthentication? googleAuth=await googleUser?.authentication;
@@ -136,73 +137,84 @@ class _LoginScreenState extends State<LoginScreen> {
 
       },));
 
+    final Phonenumber = Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+        child:IconButton(
+      icon: FaIcon(FontAwesomeIcons.phone),
+          onPressed: () { Navigator.push(
+              context,
+              MaterialPageRoute(
+              builder: (context) => phonenumber())); },),
+    );
+
     return Scaffold(
       body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(36.0),
-              child: Form(
-                  key: _formkey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(height: 25),
-                      emailField,
-                      SizedBox(height: 25),
-                      PasswordField,
-                      SizedBox(height: 25,width:10),
-                      LoginButton,
-                      SizedBox(height: 25),
-                      signInWithGoogle,
+        child: Container(
+          color: Colors.cyanAccent,
+          child: Padding(
+            padding: const EdgeInsets.all(36.0),
+            child: Form(
+                key: _formkey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Welcome",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 45),),
+                    Container(
+                      height: 100,
+                        child: Image.asset("assets/User_Avathar.png",height: 100,)),
+                    SizedBox(height: 15),
+                    emailField,
+                    SizedBox(height: 15),
+                    PasswordField,
+                    SizedBox(height: 15,width:10),
+                    LoginButton,
 
-                      SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("If You Don't Have a Account",style: TextStyle(fontSize:16 ),),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignupScreen()));
-                            },
-                            child: Text(
-                              "Register",
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
-                            ),
+                    Text("Or",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 1, 0),
+                          child: SizedBox(height: 15),
+                        ),
+                        signInWithGoogle,
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(4, 0, 0, 0),
+                          child: SizedBox(height: 25),
+                        ),
+                        Phonenumber,
+                      ],
+                    ),
+                    SizedBox(height: 6,),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Need a account?",style: TextStyle(fontSize:16 ),),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignupScreen()));
+                          },
+                          child: Text(
+                            "Sign-Up",
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
                           ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Login With Phone",style: TextStyle(fontSize:16 ),),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => phonenumber()));
-                            },
-                            child: Icon(Icons.phone,color:Colors.redAccent),
-                          )
-                        ],
-                      )
-                    ],
-                  )),
-            ),
+                        ),
+                      ],
+                    ),
+            ]),
           ),
         ),
       ),
-    );
+    ));
   }
 }
