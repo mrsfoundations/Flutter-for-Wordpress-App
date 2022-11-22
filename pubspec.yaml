@@ -36,6 +36,7 @@ dependencies:
   flutter_custom_carousel_slider: ^1.2.0
   timelines: ^0.1.0
   webview_flutter: ^2.0.4
+  flutter_linkify: ^5.0.2
 
 
 dev_dependencies:

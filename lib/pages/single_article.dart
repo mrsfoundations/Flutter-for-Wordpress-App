@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -10,9 +11,14 @@ import 'package:flutter_wordpress_app/models/Article.dart';
 import 'package:flutter_wordpress_app/pages/comments.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import 'browser.dart';
 
 class SingleArticle extends StatefulWidget {
   final dynamic article;
@@ -48,7 +54,7 @@ class _SingleArticleState extends State<SingleArticle> {
         isSpeaking=false;
       });
     });
-     }
+  }
   @override
   void initState() {
     super.initState();
@@ -132,9 +138,19 @@ class _SingleArticleState extends State<SingleArticle> {
 
   @override
   Widget build(BuildContext context) {
+    String? _parseHtmlString(var htmlString) {
+      var document = parse(htmlString);
+      var parsedString = parse(document.body?.text).documentElement?.text;
+
+      return parsedString;
+    }
+    String content = _parseHtmlString(widget.article.content) as String;
     final article = widget.article;
     final heroId = widget.heroId;
     final articleVideo = widget.article.video;
+
+    var articleLink = article.content.toString().split('<p>').last;
+
     String youtubeUrl = "";
     String dailymotionUrl = "";
     if (articleVideo.contains("youtube")) {
@@ -166,67 +182,67 @@ class _SingleArticleState extends State<SingleArticle> {
                                 BlendMode.overlay),
                             child: articleVideo != ""
                                 ? articleVideo.contains("youtube")
-                                    ? Container(
-                                        padding: EdgeInsets.fromLTRB(
-                                            0,
-                                            MediaQuery.of(context).padding.top,
-                                            0,
-                                            0),
-                                        decoration:
-                                            BoxDecoration(color: Colors.black),
-                                        child: HtmlWidget(
-                                          """
+                                ? Container(
+                              padding: EdgeInsets.fromLTRB(
+                                  0,
+                                  MediaQuery.of(context).padding.top,
+                                  0,
+                                  0),
+                              decoration:
+                              BoxDecoration(color: Colors.black),
+                              child: HtmlWidget(
+                                """
                                       <iframe src="https://www.youtube.com/embed/$youtubeUrl" frameborder="0" allow="accelerometer;
                                        autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>""" ,
-                                          webView: true,
-                                        ),
-                                      )
+                                webView: true,
+                              ),
+                            )
 
-                                    : articleVideo.contains("dailymotion")
-                                        ? Container(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0,
-                                                MediaQuery.of(context)
-                                                    .padding
-                                                    .top,
-                                                0,
-                                                0),
-                                            decoration: BoxDecoration(
-                                                color: Colors.black),
-                                            child: HtmlWidget(
-                                              """
+                                : articleVideo.contains("dailymotion")
+                                ? Container(
+                              padding: EdgeInsets.fromLTRB(
+                                  0,
+                                  MediaQuery.of(context)
+                                      .padding
+                                      .top,
+                                  0,
+                                  0),
+                              decoration: BoxDecoration(
+                                  color: Colors.black),
+                              child: HtmlWidget(
+                                """
                                       <iframe frameborder="0"
                                       src="https://www.dailymotion.com/embed/video/$dailymotionUrl?autoplay=1&mute=1"
                                       allowfullscreen allow="autoplay">
                                       </iframe>
                                       """,
 
-                                              webView: true,
-                                            ),
-                                          )
-                                        : Container(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0,
-                                                MediaQuery.of(context)
-                                                    .padding
-                                                    .top,
-                                                0,
-                                                0),
-                                            decoration: BoxDecoration(
-                                                color: Colors.black),
-                                            child: HtmlWidget(
-                                              """
+                                webView: true,
+                              ),
+                            )
+                                : Container(
+                              padding: EdgeInsets.fromLTRB(
+                                  0,
+                                  MediaQuery.of(context)
+                                      .padding
+                                      .top,
+                                  0,
+                                  0),
+                              decoration: BoxDecoration(
+                                  color: Colors.black),
+                              child: HtmlWidget(
+                                """
                                       <video autoplay="" playsinline="" controls>
                                       <source type="video/mp4" src="$articleVideo">
                                       </video>
                                       """,
-                                              webView: true,
-                                            ),
-                                          )
+                                webView: true,
+                              ),
+                            )
                                 : Image.network(
-                                    article.image,
-                                    fit: BoxFit.cover,
-                                  ),
+                              article.image,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -235,7 +251,7 @@ class _SingleArticleState extends State<SingleArticle> {
                       top: MediaQuery.of(context).padding.top,
                       child: IconButton(
                         icon: Icon(Icons.arrow_back),
-                        color: Colors.white,
+                        color: Colors.black,
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -271,32 +287,39 @@ class _SingleArticleState extends State<SingleArticle> {
                         ),
                       ),
 
-                       Card(
-                         child: Container(
-                           height: 60,
-                           color: Colors.lightGreen,
-                           child: ListTile(
-                             leading: CircleAvatar(
-                               backgroundImage: NetworkImage(article.avatar),
-                             ),
-                             title: Text(
-                               "By " + article.author,
-                               style: TextStyle(fontSize: 16),
-                             ),
-                             subtitle: Text(
-                               article.date,
-                               style: TextStyle(fontSize: 12),
-                             ),
-                           ),
-                         ),
-                       ),
+                      Card(
+                        child: Container(
+                          height: 60,
+                          color: Colors.lightGreen,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(article.avatar),
+                            ),
+                            title: Text(
+                              "By " + article.author,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            subtitle: Text(
+                              article.date,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      ),
 
                       Container(
                         padding: EdgeInsets.fromLTRB(16, 36, 16, 50),
                         child: HtmlWidget(
                           article.content,
                           webView: true,
-                          textStyle: Theme.of(context).textTheme.bodyText1 ?? TextStyle(),
+                          onTapUrl: (link) async {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                builder: (context) => Browser(link)));
+
+                            return true;
+                          },
                         ),
                       ),
                     ],
@@ -416,7 +439,7 @@ class _SingleArticleState extends State<SingleArticle> {
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
             height: 150
-            );
+        );
       },
     );
   }

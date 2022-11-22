@@ -5,7 +5,7 @@ import 'package:flutter_wordpress_app/models/Article.dart';
 Widget articleBox(BuildContext context, Article article, String heroId) {
   return ConstrainedBox(
     constraints: new BoxConstraints(
-      maxHeight: 170.0,
+      maxHeight: 150.0,
     ),
     child: Stack(
       children: <Widget>[
@@ -24,9 +24,9 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
                       children: <Widget>[
                         Container(
                           child: Html(
-                            data: article.title!.length > 70
+                            data: article.title!.length > 30
                                 ? "<h2>" +
-                                    article.title!.substring(0, 70) +
+                                    article.title!.substring(0, 30) +
                                     "...</h2>"
                                 : "<h2>" +
                                     article.title.toString() +
