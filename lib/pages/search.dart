@@ -8,6 +8,7 @@ import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
 import 'package:flutter_wordpress_app/widgets/searchBoxes.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -96,11 +97,53 @@ class _SearchState extends State<Search> {
     }
   }
 
+  bool isLoaded = false;
+  InterstitialAd? interstitialAd;
+  var clickcount = 0;
+
   @override
   void dispose() {
     super.dispose();
     _textFieldController.dispose();
     _controller!.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    InterstitialAd.load(
+      adUnitId:"ca-app-pub-3940256099942544/1033173712",
+      request:AdRequest( ),
+      adLoadCallback:InterstitialAdLoadCallback(
+        onAdLoaded: (ad){
+          setState(() {
+            isLoaded=true;
+            this.interstitialAd=ad;
+
+          });
+          print("Ad");
+        },
+        onAdFailedToLoad: (error){
+          print("Interstitial Ad");
+        },
+      ),
+    );
+  }
+
+  void showInterstitial()async{
+    interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('Ad Showed'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) =>
+          ad.dispose(),
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        Navigator.of(context).pop();
+        ad.dispose();
+      },
+      onAdImpression: (InterstitialAd ad) => print('Impression'),
+    );
+    interstitialAd?.show();
   }
 
   @override
@@ -243,6 +286,13 @@ class _SearchState extends State<Search> {
                 final heroId = item.id.toString() + "-searched";
                 return InkWell(
                   onTap: () {
+                    setState(() {
+                      clickcount = clickcount +1 ;
+                      if (clickcount > 2) {
+                        showInterstitial();
+                        clickcount = 0;
+                      }
+                    });
                     Navigator.push(
                       context,
                       MaterialPageRoute(

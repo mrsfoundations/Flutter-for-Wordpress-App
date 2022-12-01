@@ -6,6 +6,7 @@ import 'package:flutter_wordpress_app/models/Article.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,6 +37,10 @@ class _LocalArticlesState extends State<LocalArticles> {
     _controller!.addListener(_scrollListener);
     _infiniteStop = false;
   }
+
+  bool isLoaded = false;
+  InterstitialAd? interstitialAd;
+  var clickcount = 0;
 
   @override
   void dispose() {
@@ -83,6 +88,42 @@ class _LocalArticlesState extends State<LocalArticles> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    InterstitialAd.load(
+      adUnitId:"ca-app-pub-3940256099942544/1033173712",
+      request:AdRequest( ),
+      adLoadCallback:InterstitialAdLoadCallback(
+        onAdLoaded: (ad){
+          setState(() {
+            isLoaded=true;
+            this.interstitialAd=ad;
+
+          });
+          print("Ad");
+        },
+        onAdFailedToLoad: (error){
+          print("Interstitial Ad");
+        },
+      ),
+    );
+  }
+  void showInterstitial()async{
+    interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('Ad Showed'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) =>
+          ad.dispose(),
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        Navigator.of(context).pop();
+        ad.dispose();
+      },
+      onAdImpression: (InterstitialAd ad) => print('Impression'),
+    );
+    interstitialAd?.show();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,6 +223,13 @@ class _LocalArticlesState extends State<LocalArticles> {
                 final heroId = item.id.toString() + "-latest";
                 return InkWell(
                   onTap: () {
+                    setState(() {
+                      clickcount = clickcount +1 ;
+                      if (clickcount > 2) {
+                        showInterstitial();
+                        clickcount = 0;
+                      }
+                    });
                     Navigator.push(
                       context,
                       MaterialPageRoute(

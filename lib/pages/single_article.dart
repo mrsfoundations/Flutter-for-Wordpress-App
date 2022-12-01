@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -14,11 +13,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 import 'browser.dart';
+import 'category_articles.dart';
 
 class SingleArticle extends StatefulWidget {
   final dynamic article;
@@ -35,49 +31,49 @@ class _SingleArticleState extends State<SingleArticle> {
   final _flutterTts = FlutterTts();
   List<dynamic> relatedArticles = [];
   Future<List<dynamic>>? _futureRelatedArticles;
+  bool _infiniteStop = false;
 
-
-
-  void initialization(){
-    _flutterTts.setStartHandler((){
+   void initialization() {
+    _flutterTts.setStartHandler(() {
       setState(() {
-        isSpeaking=true;
+        isSpeaking = true;
       });
     });
     _flutterTts.setCompletionHandler(() {
       setState(() {
-        isSpeaking=false;
+        isSpeaking = false;
       });
     });
     _flutterTts.setErrorHandler((message) {
       setState(() {
-        isSpeaking=false;
+        isSpeaking = false;
       });
     });
   }
+
   @override
   void initState() {
     super.initState();
     initialization();
 
-
     _futureRelatedArticles = fetchRelatedArticles();
 
     print(_futureRelatedArticles);
   }
-  void speak()async{
+
+  void speak() async {
     await _flutterTts.setLanguage('ta');
     await _flutterTts.setSpeechRate(0.5);
-    if(_futureRelatedArticles != null){
-      await _flutterTts.speak(widget.article.content);
+    if (_futureRelatedArticles != null) {
+      await _flutterTts.speak(widget.article.content.toString());
     }
   }
-  void stop()async{
+
+  void stop() async {
     await _flutterTts.stop();
     setState(() {
       isSpeaking = false;
     });
-
   }
 
   Future<List<dynamic>> fetchRelatedArticles() async {
@@ -113,26 +109,26 @@ class _SingleArticleState extends State<SingleArticle> {
 
   var isLoaded = false;
   BannerAd? bannerAd;
+  InterstitialAd? interstitialAd;
+  var clickcount = 0;
 
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
 
-    bannerAd=BannerAd(size:AdSize.banner,
-        adUnitId:"ca-app-pub-3940256099942544/6300978111",
-        listener:BannerAdListener(
-            onAdLoaded:(ad){
-              setState(() {
-                isLoaded=true;
-              });
-              print("Banner Loaded");
-            },
-            onAdFailedToLoad:(ad, error) {
-              ad.dispose();
-            }),
-        request: AdRequest()
-    );
+    bannerAd = BannerAd(
+        size: AdSize.banner,
+        adUnitId: "ca-app-pub-3940256099942544/6300978111",
+        listener: BannerAdListener(onAdLoaded: (ad) {
+          setState(() {
+            isLoaded = true;
+          });
+          print("Banner Loaded");
+        }, onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+        }),
+        request: AdRequest());
     bannerAd!.load();
   }
 
@@ -144,12 +140,16 @@ class _SingleArticleState extends State<SingleArticle> {
 
       return parsedString;
     }
+
     String content = _parseHtmlString(widget.article.content) as String;
     final article = widget.article;
     final heroId = widget.heroId;
     final articleVideo = widget.article.video;
 
-    var articleLink = article.content.toString().split('<p>').last;
+    var articleLink = article.content
+        .toString()
+        .split('<p>')
+        .last;
 
     String youtubeUrl = "";
     String dailymotionUrl = "";
@@ -160,6 +160,7 @@ class _SingleArticleState extends State<SingleArticle> {
       dailymotionUrl = articleVideo.split("/video/")[1];
     }
 
+    bool webViewMediaPlaybackAlwaysAllow;
 
     return Scaffold(
       body: Container(
@@ -185,7 +186,10 @@ class _SingleArticleState extends State<SingleArticle> {
                                 ? Container(
                               padding: EdgeInsets.fromLTRB(
                                   0,
-                                  MediaQuery.of(context).padding.top,
+                                  MediaQuery
+                                      .of(context)
+                                      .padding
+                                      .top,
                                   0,
                                   0),
                               decoration:
@@ -193,16 +197,16 @@ class _SingleArticleState extends State<SingleArticle> {
                               child: HtmlWidget(
                                 """
                                       <iframe src="https://www.youtube.com/embed/$youtubeUrl" frameborder="0" allow="accelerometer;
-                                       autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>""" ,
+                                       autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>""",
                                 webView: true,
                               ),
                             )
-
                                 : articleVideo.contains("dailymotion")
                                 ? Container(
                               padding: EdgeInsets.fromLTRB(
                                   0,
-                                  MediaQuery.of(context)
+                                  MediaQuery
+                                      .of(context)
                                       .padding
                                       .top,
                                   0,
@@ -216,14 +220,14 @@ class _SingleArticleState extends State<SingleArticle> {
                                       allowfullscreen allow="autoplay">
                                       </iframe>
                                       """,
-
                                 webView: true,
                               ),
                             )
                                 : Container(
                               padding: EdgeInsets.fromLTRB(
                                   0,
-                                  MediaQuery.of(context)
+                                  MediaQuery
+                                      .of(context)
                                       .padding
                                       .top,
                                   0,
@@ -248,7 +252,10 @@ class _SingleArticleState extends State<SingleArticle> {
                       ),
                     ),
                     Positioned(
-                      top: MediaQuery.of(context).padding.top,
+                      top: MediaQuery
+                          .of(context)
+                          .padding
+                          .top,
                       child: IconButton(
                         icon: Icon(Icons.arrow_back),
                         color: Colors.black,
@@ -259,9 +266,14 @@ class _SingleArticleState extends State<SingleArticle> {
                     ),
                   ],
                 ),
-                isLoaded?Container(
+                isLoaded
+                    ? Container(
                   height: 50,
-                  child: AdWidget(ad: bannerAd!,),):SizedBox(),
+                  child: AdWidget(
+                    ad: bannerAd!,
+                  ),
+                )
+                    : SizedBox(),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,46 +281,63 @@ class _SingleArticleState extends State<SingleArticle> {
                     children: <Widget>[
                       Html(data: "<h2>" + article.title + "</h2>", style: {
                         "h2": Style(
-                            color: Theme.of(context).primaryColorDark,
-                            fontWeight: FontWeight.w500,
-                            fontSize: FontSize.em(1.6),
-                            padding: EdgeInsets.all(4)),
+                            color: Theme
+                                .of(context)
+                                .primaryColorDark,
+                            fontSize: FontSize.em(1),
+                            padding: EdgeInsets.all(3)),
                       }),
-
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Color(0xFFE3E3E3),
-                            borderRadius: BorderRadius.circular(3)),
-                        padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
-                        margin: EdgeInsets.all(16),
-                        child: Text(
-                          article.category,
-                          style: TextStyle(color: Colors.black, fontSize: 11),
-                        ),
-                      ),
-
-                      Card(
+                      GestureDetector(
                         child: Container(
-                          height: 60,
-                          color: Colors.lightGreen,
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(article.avatar),
+                          decoration: BoxDecoration(
+                              color: Color(0xFFE3E3E3),
+                              borderRadius: BorderRadius.circular(5)),
+                          padding: EdgeInsets.all(2),
+                          margin: EdgeInsets.all(8),
+                          child: Text(
+                            article.category,
+                            style: TextStyle(color: Colors.black, fontSize: 11),
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CategoryArticles(article.catId, article.category,),
                             ),
-                            title: Text(
-                              "By " + article.author,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            subtitle: Text(
-                              article.date,
-                              style: TextStyle(fontSize: 12),
-                            ),
+                          );
+                        },
+                      ),
+                      Card(
+                        color: Colors.greenAccent,
+                        child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(article.avatar),
+                                radius: 15,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+                                child: Row(
+                                  children: [
+                                    Text("By:" + article.author,
+                                        style: TextStyle(fontSize: 9)),
+                                    Text(
+                                      ",updated on: " + article.date,
+                                      style: TextStyle(fontSize: 8),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-
                       Container(
-                        padding: EdgeInsets.fromLTRB(16, 36, 16, 50),
+                        padding: EdgeInsets.fromLTRB(5, 3, 3, 0),
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                         child: HtmlWidget(
                           article.content,
                           webView: true,
@@ -316,7 +345,7 @@ class _SingleArticleState extends State<SingleArticle> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                builder: (context) => Browser(link)));
+                                    builder: (context) => Browser(link)));
 
                             return true;
                           },
@@ -328,8 +357,7 @@ class _SingleArticleState extends State<SingleArticle> {
                 relatedPosts(_futureRelatedArticles as Future<List<dynamic>>)
               ],
             ),
-          )
-      ),
+          )),
       bottomNavigationBar: BottomAppBar(
         child: Container(
           decoration: BoxDecoration(color: Colors.white10),
@@ -379,13 +407,85 @@ class _SingleArticleState extends State<SingleArticle> {
         children: <Widget>[
           FloatingActionButton(
             child: Icon(Icons.mic),
-            onPressed: (){
+            onPressed: () {
               isSpeaking ? stop() : speak();
             },
           ),
         ],
       ),
     );
+  }
+
+  Widget categoryPosts(Future<List<dynamic>> categoryArticles) {
+    return FutureBuilder<List<dynamic>>(
+      future: categoryArticles,
+      builder: (context, articleSnapshot) {
+        if (articleSnapshot.hasData) {
+          if (articleSnapshot.data!.length == 0) return Container();
+          return Column(
+            children: <Widget>[
+              Column(
+                  children: articleSnapshot.data!.map((item) {
+                    final heroId = item.category.toString() + "-categorypost";
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          clickcount = clickcount + 1;
+                          if (clickcount > 2) {
+                            showInterstitial();
+                            clickcount = 0;
+                          }
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SingleArticle(item, heroId),
+                          ),
+                        );
+                      },
+                      child: articleBox(context, item, heroId),
+                    );
+                  }).toList()),
+              !_infiniteStop
+                  ? Container(
+                alignment: Alignment.center,
+                height: 30,
+              )
+                  : Container()
+            ],
+          );
+        } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (articleSnapshot.hasError) {
+          return Container(
+              height: 500,
+              alignment: Alignment.center,
+              child: Text("${articleSnapshot.error}"));
+        }
+        return Container(
+          alignment: Alignment.center,
+          height: 400,
+
+        );
+      },
+    );
+  }
+
+  void showInterstitial() async {
+    interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('Ad Showed'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) =>
+          ad.dispose(),
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        Navigator.of(context).pop();
+        ad.dispose();
+      },
+      onAdImpression: (InterstitialAd ad) => print('Impression'),
+    );
+    interstitialAd?.show();
   }
 
   Widget relatedPosts(Future<List<dynamic>> latestArticles) {
@@ -437,9 +537,11 @@ class _SingleArticleState extends State<SingleArticle> {
         }
         return Container(
             alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: 150
-        );
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            height: 150);
       },
     );
   }

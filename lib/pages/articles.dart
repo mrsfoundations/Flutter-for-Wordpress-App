@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_carousel_slider/flutter_custom_carousel_slider.dart';
 import 'package:flutter_wordpress_app/common/constants.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:flutter_wordpress_app/pages/browser.dart';
 import 'package:flutter_wordpress_app/pages/settings.dart';
 import 'package:flutter_wordpress_app/pages/single_Article.dart';
 import 'package:flutter_wordpress_app/widgets/articleBox.dart';
@@ -33,17 +34,38 @@ class _ArticlesState extends State<Articles> {
   ScrollController? _controller;
   int page = 1;
   bool _infiniteStop = false;
+  
 
 
   @override
   void initState() {
     super.initState();
+    OnRefIndicator(page);
     _futureLastestArticles = fetchLatestArticles(1);
     _controller =
         ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
     _controller!.addListener(_scrollListener);
     _infiniteStop = false;
   }
+  bool isLoaded = false;
+  InterstitialAd? interstitialAd;
+  var clickcount = 0;
+
+
+  adsInserter(value) {
+    if (value.length > 1) {
+      value.insert(
+        value.length - 1,
+        BannerAd(
+          adUnitId: "ca-app-pub-3940256099942544/6300978111",
+          size: AdSize.banner,
+          request: AdRequest(),
+          listener: BannerAdListener(),
+        )..load(),
+      );
+    }
+  }
+
 
   @override
   void dispose() {
@@ -52,6 +74,7 @@ class _ArticlesState extends State<Articles> {
   }
 
   Future<List<dynamic>> fetchLatestArticles(int page) async {
+
     try {
       var response = await http.get(Uri.parse(
           '$WORDPRESS_URL/wp-json/wp/v2/posts/?page=$page&per_page=10&_fields=id,date,title,content,custom,link'));
@@ -73,6 +96,13 @@ class _ArticlesState extends State<Articles> {
                   item.image,
                 ),
                 onImageTap: (i) {
+                  final heroId = item.id.toString();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SingleArticle(item, heroId),
+                    ),
+                  );
                   print(item.link);
                 },
               ),
@@ -113,6 +143,13 @@ class _ArticlesState extends State<Articles> {
                 item.image,
               ),
               onImageTap: (i) {
+                final heroId = item.id.toString();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>  SingleArticle(item, heroId),
+                  ),
+                );
                 print(item.link);
               },
             );
@@ -166,6 +203,43 @@ class _ArticlesState extends State<Articles> {
   }
 
   List<CarouselItem> itemList = [];
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    InterstitialAd.load(
+      adUnitId:"ca-app-pub-3940256099942544/1033173712",
+      request:AdRequest(),
+      adLoadCallback:InterstitialAdLoadCallback(
+        onAdLoaded: (ad){
+          setState(() {
+            isLoaded=true;
+            this.interstitialAd=ad;
+
+          });
+          print("Ad");
+        },
+        onAdFailedToLoad: (error){
+          print("Interstitial Ad");
+        },
+      ),
+    );
+  }
+  void showInterstitial()async{
+    interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('Ad Showed'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) =>
+          ad.dispose(),
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        Navigator.of(context).pop();
+        ad.dispose();
+      },
+      onAdImpression: (InterstitialAd ad) => print('Impression'),
+    );
+    interstitialAd?.show();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,28 +335,49 @@ class _ArticlesState extends State<Articles> {
                   items: itemList,
                   showSubBackground: false,
                   width: MediaQuery.of(context).size.width * .9,
+
                   autoplay: true,
                 )),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {
-                      OnRefIndicator(page);
+                    await OnRefIndicator(page);
                     },
-                    child: ListView(
-                        children: articleSnapshot.data!.map((item) {
-                          final heroId = item.id.toString() + "-latest";
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SingleArticle(item, heroId),
-                                ),
+                    child: Builder(
+                      builder: (context) {
+                        adsInserter(articleSnapshot.data);
+                        return ListView(
+                            children: articleSnapshot.data!.map((item) {
+                              if (item is BannerAd) {
+                                return Container(
+                                  height: 50,
+                                  child: AdWidget(
+                                    ad: item,
+                                  ),
+                                );
+                              }
+                              final heroId = item.id.toString() + "-latest";
+                              return InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    clickcount = clickcount +1 ;
+                                    if (clickcount > 2) {
+                                      showInterstitial();
+                                      clickcount = 0;
+                                    }
+                                  });
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SingleArticle(item, heroId),
+                                    ),
+                                  );
+                                },
+                                child: articleBox(context, item, heroId),
                               );
-                            },
-                            child: articleBox(context, item, heroId),
-                          );
-                        }).toList()),
+                            }).toList());
+                      }
+                    ),
                   ),
                 ),
                 !_infiniteStop ? Container() : Container()
@@ -290,8 +385,11 @@ class _ArticlesState extends State<Articles> {
             ),
           );
         } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(child: CircularProgressIndicator()),
+            ],
           );
         } else if (articleSnapshot.hasError) {
           return Container();

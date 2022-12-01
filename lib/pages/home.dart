@@ -27,6 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   var isLoaded = false;
   BannerAd? bannerAd;
+  InterstitialAd? interstitialAd;
 
   @override
   void didChangeDependencies() {
@@ -49,6 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     bannerAd!.load();
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,92 +1,40 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_wordpress_app/models/Article.dart';
+import 'package:share/share.dart';
 
 Widget articleBox(BuildContext context, Article article, String heroId) {
   return ConstrainedBox(
     constraints: new BoxConstraints(
-      maxHeight: 150.0,
+      maxHeight: 80.0,
     ),
     child: Stack(
       children: <Widget>[
         Container(
           alignment: Alignment.bottomRight,
           child: Card(
-            elevation: 6,
+            elevation: 10,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(110, 0, 0, 0),
-
+              padding: EdgeInsets.fromLTRB(105, 0, 0, 0),
               child: Column(
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.fromLTRB(20, 0, 4, 0),
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          child: Html(
-                            data: article.title!.length > 30
-                                ? "<h2>" +
-                                    article.title!.substring(0, 30) +
-                                    "...</h2>"
-                                : "<h2>" +
-                                    article.title.toString() +
-                                    "</h2>",
-                            style: {
-                              "h2": Style(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: FontSize.em(1.05),
-                                padding: EdgeInsets.fromLTRB(2, 0, 0, 0),
-                              )
-                            },
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(1, 0, 4, 8),
-                          alignment: Alignment.topLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: Color(0xFFE3E3E3),
-                                    borderRadius: BorderRadius.circular(3)),
-                                padding: EdgeInsets.fromLTRB(8, 6, 8, 4),
-                                margin: EdgeInsets.fromLTRB(12, 0, 0, 8),
-                                child: Text(
-                                  article.category.toString(),
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.fromLTRB(12, 0, 4, 8),
-                                child: Row(
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.timer,
-                                      color: Colors.black45,
-                                      size: 12.0,
-                                    ),
-                                    SizedBox(
-                                      width: 4,
-                                    ),
-                                    Text(
-                                      article.date.toString(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .caption,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    child: Html(
+                      data: article.title!.length > 75
+                          ? "<h2>" +
+                              article.title!.substring(0, 75) +
+                              "...</h2>"
+                          : "<h2>" + article.title.toString() + "</h2>",
+                      style: {
+                        "h2": Style(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: FontSize.em(0.6),
+                          padding: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                        )
+                      },
                     ),
                   ),
                 ],
@@ -94,10 +42,58 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
             ),
           ),
         ),
+        Container(
+          padding: EdgeInsets.fromLTRB(0, 57, 4, 0),
+          alignment: Alignment.topLeft,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                    color: Color(0xFFE3E3E3),
+                    borderRadius: BorderRadius.circular(3)),
+                padding: EdgeInsets.fromLTRB(3, 3, 3, 3),
+                margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: Text(
+                  article.category.toString(),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 7,
+                      fontWeight: FontWeight.w400),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+            padding: const EdgeInsets.fromLTRB(230, 59, 0, 0),
+            child: Row(children: <Widget>[
+              Icon(
+                Icons.timer,
+                color: Colors.black45,
+                size: 10.0,
+              ),
+              Text(
+                article.date.toString(),
+                style:TextStyle(fontSize:10),
+                textAlign: TextAlign.left,
+              ),
+            ])),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(310, 45, 0, 0),
+          child: IconButton(
+            icon: Icon(Icons.share, color: Colors.black45, size: 15.0),
+            onPressed: () {
+              Share.share(article.link.toString());
+            },
+          ),
+        ),
         SizedBox(
-          height: 160,
+          height: 80,
           width: 145,
           child: Card(
+            color: Colors.red,
             child: Hero(
               tag: heroId,
               child: ClipRRect(
