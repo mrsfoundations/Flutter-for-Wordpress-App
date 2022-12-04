@@ -6,6 +6,7 @@ import 'package:flutter_wordpress_app/pages/home.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'firebase_options.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 
 final auth = FirebaseAuth.instance;
 
@@ -35,7 +36,16 @@ class _OneSignalScreenState extends State<OneSignalScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: App(),
+      theme: ThemeData(
+
+      ),
+      home: AnimatedSplashScreen(
+          splashIconSize: 120,
+          duration: 1500,
+          splash:"assets/thiral-icon.png",
+          nextScreen: auth.currentUser == null? const LoginScreen() : MyHomePage(),
+          splashTransition: SplashTransition.fadeTransition,
+          backgroundColor: Colors.lightBlueAccent),
     );
   }
   Future<void> initPlateformState()async{
@@ -43,35 +53,5 @@ class _OneSignalScreenState extends State<OneSignalScreen> {
   }
 }
 
-class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(// Initialize FlutterFire
-      future: Firebase.initializeApp(),
-      builder: (context, snapshot) {
-        // Check for errors
-
-          return MyApp();
-        }
-        // Otherwise, show something whilst waiting for initialization to complete
-    );
-  }
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: auth.currentUser == null? const LoginScreen() : MyHomePage(),
-    );
-  }
-}
 
 

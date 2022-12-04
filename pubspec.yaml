@@ -35,7 +35,7 @@ dependencies:
   flutter_tts: ^3.5.3
   flutter_custom_carousel_slider: ^1.2.0
   webview_flutter: ^2.0.4
-
+  animated_splash_screen: ^1.3.0
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +56,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/thiral-icon.png
     - assets/Whatsapp_icon.png
     - assets/Youtubeicon.png
     - assets/User_Avathar.png
